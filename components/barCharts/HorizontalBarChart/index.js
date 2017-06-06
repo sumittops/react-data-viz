@@ -43,8 +43,10 @@ export default class HorizontalBarChart extends Component{
                 data, isDataReady: true, width: width- this.props.margin.left - this.props.margin.right
             });
             let translateAxis = `translate(${this.props.margin.left},${this.props.margin.top + this.props.height})`;
-            d3Select(this.node.querySelector('#x-axis')).remove();
-            d3Select(this.node).append('g').attr('id','x-axis').attr('transform',translateAxis).call(axisBottom().scale(this.scale));          
+            if(this.props.showAxes){
+                d3Select(this.node.querySelector('#x-axis')).remove();
+                d3Select(this.node).append('g').attr('id','x-axis').attr('transform',translateAxis).call(axisBottom().scale(this.scale));          
+            }
         }
     }
     render(){
@@ -52,7 +54,7 @@ export default class HorizontalBarChart extends Component{
         return (
             <svg className="default" ref={node=>this.node = node}
                 height={this.props.height + this.props.margin.top + this.props.margin.bottom} 
-                width={this.state.width + this.props.margin.left + this.props.margin.right}>
+                width={this.node?this.state.width + this.props.margin.left + this.props.margin.right:this.state.width}>
                 <g transform={translateG}>
                 {
                     this.state.data.map((item,i)=>
