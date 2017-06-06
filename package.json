@@ -14,6 +14,7 @@
   "author": "Sumit Majumdar",
   "license": "MIT",
   "dependencies": {
+    "d3-axis": "^1.0.7",
     "d3-scale": "^1.0.6",
     "prop-types": "^15.5.10",
     "react": "^15.5.4",
