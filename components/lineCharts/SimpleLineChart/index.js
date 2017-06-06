@@ -16,25 +16,28 @@ export default class SimpleLineChart extends Component {
         };
     }
     componentDidMount(){
-        this.transform();
+        this.transform(this.props.data);
     }
-    componentDidUpdate(){
+    componentWillReceiveProps(nextProps){
+        this.transform(nextProps.data);
+    }
+    componentDidUpdate(){        
         window.addEventListener('resize',()=> this.transform());
     }
     componentWillUnmount(){
         window.removeEventListener('resize');
     }
-    transform(){
+    transform(data){
         let chartWidth = this.node.parentNode.getBoundingClientRect().width;
         let margin = this.props.margin;
-        let xScale = scaleLinear().domain(extent(this.props.data, d=> d.x)).range([0,chartWidth - margin.left - margin.right]);
-        let yScale = scaleLinear().domain(extent(this.props.data, d=> d.y)).range([0,this.props.height - margin.top - margin.bottom ]);
+        let xScale = scaleLinear().domain(extent(data, d=> d.x)).range([0,chartWidth - margin.left - margin.right]);
+        let yScale = scaleLinear().domain(extent(data, d=> d.y)).range([0,this.props.height - margin.top - margin.bottom ]);
         let lineGen = d3Line().x(d=> xScale(d.x)).y(d=> yScale(d.y));
         this.setState({
-            pathData: lineGen(this.props.data), width:chartWidth - margin.left - margin.right 
+            pathData: lineGen(data), width:chartWidth - margin.left - margin.right 
         });
         if(this.props.showAxes){
-            let translateXAxis = `translate(${this.props.margin.left},${this.props.margin.top + this.props.height})`;
+            let translateXAxis = `translate(${this.props.margin.left},${this.props.height})`;
             let translateYAxis = `translate(${this.props.margin.left},${this.props.margin.top })`;
             d3Select(this.node.querySelector('#x-axis')).remove();
             d3Select(this.node.querySelector('#y-axis')).remove();
@@ -50,7 +53,7 @@ export default class SimpleLineChart extends Component {
                 width={this.node?this.state.width + this.props.margin.left + this.props.margin.right:this.state.width}>
                 {   this.state.pathData && 
                     <g transform={translateG}>
-                        <path d={this.state.pathData} fill="none" stroke="#999" />
+                        <path d={this.state.pathData} fill="none" stroke={this.props.lineColor} />
                     </g>
                 }
             </svg>
@@ -69,10 +72,11 @@ SimpleLineChart.propTypes = {
         top: PropTypes.number,
         bottom: PropTypes.number,
     }),
-    showAxes: PropTypes.bool
+    showAxes: PropTypes.bool,
+    lineColor:PropTypes.string
 };
 SimpleLineChart.defaultProps = {
     data: [], isTimeScaled: false, margin:{
         left: 30, top: 10, bottom: 20, right: 10
-    }, height: 300, showAxes: true
+    }, height: 300, showAxes: true, lineColor: '#999999'
 };

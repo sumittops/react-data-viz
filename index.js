@@ -15,13 +15,30 @@ const horizontalChartMargin = {
     left: 50, top: 10, bottom: 20, right: 10
 };
 class App extends React.Component{
+    constructor(){
+        super();
+        this.state = {
+            data: superFake
+        };
+    }
+    componentDidMount(){
+        let x = 7;
+        let interval = setInterval(function(){
+            this.setState({
+                data: [...this.state.data, { x:x++ , y: Math.random()*100}]
+            })
+            if(x > 20)
+                clearInterval(interval)
+        }.bind(this)
+        ,1000);
+    }
     render(){
         return (
             <div>
                 <HorizontalBarChart barHeight={25} data={fakeData} height={110} 
                     margin={horizontalChartMargin}/>
                 <VerticalBarChart data={fakeData} barWidth={25} height={300} />
-                <SimpleLineChart data={superFake}></SimpleLineChart>
+                <SimpleLineChart data={this.state.data} lineColor={'#003388'}></SimpleLineChart>
             </div>
         );
     }
@@ -31,5 +48,5 @@ ReactDOM.render(
 );
 
 export default {
-    Palette, HorizontalBarChart, VerticalBarChart
+    Palette, HorizontalBarChart, VerticalBarChart, SimpleLineChart
 };
