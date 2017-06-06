@@ -8,9 +8,15 @@ import SimpleLineChart from './components/lineCharts/SimpleLineChart';
 
 const fakeData = [{ key:'blood', value: 121 },{ key:'argon',  value: 112 },
     { key: 'novel', value: 31 }, { key: 'sixtytwo', value: 76 }];
-const superFake = [{ x: 1, y: 190},
-    { x: 2, y: 120 }, { x: 2, y: 10}, { x: 3, y: 80} , { x: 5, y: 120}, { x: 6, y: 92}
-];
+const superFake = ()=>{
+    let fake = [];
+    for(let i = 0; i < 10; i++){
+        fake =  [...fake, {
+            x: i, y: parseFloat(Math.random()*100)
+        }]
+    }
+    return fake;
+}
 const horizontalChartMargin = {
     left: 50, top: 10, bottom: 20, right: 10
 };
@@ -18,19 +24,8 @@ class App extends React.Component{
     constructor(){
         super();
         this.state = {
-            data: superFake
+            data: superFake()
         };
-    }
-    componentDidMount(){
-        let x = 7;
-        let interval = setInterval(function(){
-            this.setState({
-                data: [...this.state.data, { x:x++ , y: Math.random()*100}]
-            })
-            if(x > 20)
-                clearInterval(interval)
-        }.bind(this)
-        ,1000);
     }
     render(){
         return (

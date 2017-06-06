@@ -18,9 +18,13 @@ export default class HorizontalBarChart extends Component{
             })),
             width: '100%'
         };
+        this.eventListenerSet = false;
     }
     componentDidUpdate (){
-        window.addEventListener('resize',()=>this.transform());
+        if(!this.eventListenerSet){
+            window.addEventListener('resize',()=>this.transform());
+            this.eventListenerSet = true;
+        } 
     }
     componentDidMount(){
         this.transform();
@@ -29,25 +33,23 @@ export default class HorizontalBarChart extends Component{
         window.removeEventListener('resize');
     }
     transform(){
-        if(this.props.data && this.props.data.length){
-            this.color = new Color();
-            let maxValue = max(this.props.data.map(d=> d.value));
-            let width = this.node.parentNode.getBoundingClientRect().width;
-            this.scale = scaleLinear().domain([0,maxValue])
-                        .range([0, width- this.props.margin.left - this.props.margin.right]);
-            let data = this.props.data.map(({key,value},i)=>({
-                 key, value, width: this.scale(value), color: this.color.getNextColor(),
-                 transform:`translate(0,${i*(this.props.barHeight+ this.barMargin)})`
-            }));
-            this.setState({
-                data, isDataReady: true, width: width- this.props.margin.left - this.props.margin.right
-            });
-            let translateAxis = `translate(${this.props.margin.left},${this.props.margin.top + this.props.height})`;
-            if(this.props.showAxes){
-                d3Select(this.node.querySelector('#x-axis')).remove();
-                d3Select(this.node).append('g').attr('id','x-axis').attr('transform',translateAxis).call(axisBottom().scale(this.scale));          
-            }
-        }
+        this.color = new Color();
+        let maxValue = max(this.props.data.map(d=> d.value));
+        let width = this.node.parentNode.getBoundingClientRect().width;
+        this.scale = scaleLinear().domain([0,maxValue])
+                    .range([0, width- this.props.margin.left - this.props.margin.right]);
+        let data = this.props.data.map(({key,value},i)=>({
+                key, value, width: this.scale(value), color: this.color.getNextColor(),
+                transform:`translate(0,${i*(this.props.barHeight+ this.barMargin)})`
+        }));
+        this.setState({
+            data, isDataReady: true, width: width- this.props.margin.left - this.props.margin.right
+        });
+        let translateAxis = `translate(${this.props.margin.left},${this.props.margin.top + this.props.height})`;
+        if(this.props.showAxes){
+            d3Select(this.node.querySelector('#x-axis')).remove();
+            d3Select(this.node).append('g').attr('id','x-axis').attr('transform',translateAxis).call(axisBottom().scale(this.scale));          
+        } 
     }
     render(){
         let translateG = `translate(${this.props.margin.left},${this.props.margin.top})`;

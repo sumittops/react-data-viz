@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { scaleLinear } from 'd3-scale';
 import PropTypes from 'prop-types';
 import { extent } from 'd3-array';
-import { axisBottom, axisLeft } from 'd3-axis';
+import { axisBottom, axisLeft, axisRight } from 'd3-axis';
 import { select as d3Select } from 'd3-selection';
 import { line as d3Line } from 'd3-shape';
 import { Color } from '../../../core/utils';
@@ -14,6 +14,7 @@ export default class SimpleLineChart extends Component {
             width: '100%',
             pathData: null,
         };
+        this.isListenerSet = false;
     }
     componentDidMount(){
         this.transform(this.props.data);
@@ -21,8 +22,11 @@ export default class SimpleLineChart extends Component {
     componentWillReceiveProps(nextProps){
         this.transform(nextProps.data);
     }
-    componentDidUpdate(){        
-        window.addEventListener('resize',()=> this.transform());
+    componentDidUpdate(){    
+        if(!this.isListenerSet){
+            window.addEventListener('resize',()=> this.transform(this.props.data));
+            this.isListenerSet = true;
+        }
     }
     componentWillUnmount(){
         window.removeEventListener('resize');
@@ -31,13 +35,13 @@ export default class SimpleLineChart extends Component {
         let chartWidth = this.node.parentNode.getBoundingClientRect().width;
         let margin = this.props.margin;
         let xScale = scaleLinear().domain(extent(data, d=> d.x)).range([0,chartWidth - margin.left - margin.right]);
-        let yScale = scaleLinear().domain(extent(data, d=> d.y)).range([0,this.props.height - margin.top - margin.bottom ]);
+        let yScale = scaleLinear().domain(extent(data, d=> d.y)).range([this.props.height - margin.top - margin.bottom,0]);
         let lineGen = d3Line().x(d=> xScale(d.x)).y(d=> yScale(d.y));
         this.setState({
-            pathData: lineGen(data), width:chartWidth - margin.left - margin.right 
+            pathData: lineGen(data), width: chartWidth - margin.left - margin.right 
         });
         if(this.props.showAxes){
-            let translateXAxis = `translate(${this.props.margin.left},${this.props.height})`;
+            let translateXAxis = `translate(${this.props.margin.left},${this.props.height - this.props.margin.top })`;
             let translateYAxis = `translate(${this.props.margin.left},${this.props.margin.top })`;
             d3Select(this.node.querySelector('#x-axis')).remove();
             d3Select(this.node.querySelector('#y-axis')).remove();
