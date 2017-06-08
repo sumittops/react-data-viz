@@ -41,8 +41,8 @@ export default class SimpleLineChart extends Component {
             pathData: lineGen(data), width: chartWidth - margin.left - margin.right 
         });
         if(this.props.showAxes){
-            let translateXAxis = `translate(${this.props.margin.left},${this.props.height - this.props.margin.top })`;
-            let translateYAxis = `translate(${this.props.margin.left},${this.props.margin.top })`;
+            let translateXAxis = `translate(${this.props.margin.left},${this.props.height - margin.bottom  })`;
+            let translateYAxis = `translate(${this.props.margin.left},${ margin.top })`;
             d3Select(this.node.querySelector('#x-axis')).remove();
             d3Select(this.node.querySelector('#y-axis')).remove();
             d3Select(this.node).append('g').attr('id','x-axis').attr('transform',translateXAxis).call(axisBottom().scale(xScale));

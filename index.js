@@ -33,7 +33,7 @@ class App extends React.Component{
                 <HorizontalBarChart barHeight={25} data={fakeData} height={110} 
                     margin={horizontalChartMargin}/>
                 <VerticalBarChart data={fakeData} barWidth={25} height={300} />
-                <SimpleLineChart data={this.state.data} lineColor={'#003388'}></SimpleLineChart>
+                <SimpleLineChart data={this.state.data} lineColor={'#009688'}></SimpleLineChart>
             </div>
         );
     }
