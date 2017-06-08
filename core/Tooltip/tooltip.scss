@@ -1,0 +1,12 @@
+.tooltip{
+    position: fixed;
+    z-index: 99;
+    display: inline-block;
+    background-color: #ffffff;
+    box-shadow: 0 0 4px #aaa;
+    min-height: 240px;
+    min-width: 320px;
+}
+.tooltip.hidden{
+    display: none;
+}

@@ -1,4 +1,22 @@
 .line{
     fill: none;
     stroke: #999;
+    stroke-width: 2px;
+}
+.legend-box{
+    display: flex;
+    justify-content: flex-end;
+    .legend-item{
+        display: flex;
+        margin-right: 10px;
+        align-items: center;
+        .legend-rect{
+            height: 14px; width: 14px;
+            margin-right: 4px;
+            border-radius:50%;
+        }
+        .legend-text{
+            font-size: 13px;
+        }
+    }
 }
