@@ -4,7 +4,9 @@
   "description": "A library for svg based charts built on top React [uses virtual dom]",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "start": "webpack-dev-server",
+    "build": "webpack"
   },
   "keywords": [
     "Charts",
@@ -31,6 +33,7 @@
     "clean-webpack-plugin": "^0.1.16",
     "css-loader": "^0.28.4",
     "extract-text-webpack-plugin": "^2.1.0",
+    "jest": "^20.0.4",
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.5",
     "style-loader": "^0.18.1",
