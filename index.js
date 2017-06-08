@@ -30,7 +30,7 @@ const superFake2 = ()=>{
 const horizontalChartMargin = {
     left: 50, top: 10, bottom: 20, right: 10
 };
-class App extends React.Component{
+export default class App extends React.Component{
     constructor(){
         super();
         this.state = {
@@ -61,7 +61,3 @@ class App extends React.Component{
 ReactDOM.render(
     <App/>, document.getElementById('root')
 );
-
-export default {
-    Palette, HorizontalBarChart, VerticalBarChart, SimpleLineChart
-};

@@ -5,13 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test-watch":"jest --watchAll",
     "start": "webpack-dev-server",
     "build": "webpack"
   },
   "keywords": [
-    "Charts",
-    "React",
-    "SVG"
+    "charts",
+    "react",
+    "svg",
+    "visualization",
+    "visualisation",
+    "data"
   ],
   "author": "Sumit Majumdar",
   "license": "MIT",
@@ -32,12 +36,20 @@
     "babel-preset-react": "^6.24.1",
     "clean-webpack-plugin": "^0.1.16",
     "css-loader": "^0.28.4",
+    "enzyme": "^2.8.2",
     "extract-text-webpack-plugin": "^2.1.0",
     "jest": "^20.0.4",
+    "jest-css-modules": "^1.1.0",
     "node-sass": "^4.5.3",
+    "react-addons-test-utils": "^15.5.1",
     "sass-loader": "^6.0.5",
     "style-loader": "^0.18.1",
     "webpack": "^2.6.1",
     "webpack-dev-server": "^2.4.5"
+  },
+  "jest": {
+    "transform": {
+      ".*": "<rootDir>/node_modules/jest-css-modules"
+    }
   }
 }
