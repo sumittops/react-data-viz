@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { scaleLinear } from 'd3-scale';
+import { scaleLinear, scaleTime } from 'd3-scale';
+import { timeParse } from 'd3-time-format';
 import PropTypes from 'prop-types';
 import { extent } from 'd3-array';
 import { axisBottom, axisLeft, axisRight } from 'd3-axis';
@@ -14,31 +15,33 @@ export default class SimpleLineChart extends Component {
             width: '100%',
             pathData: null,
         };
-        this.isListenerSet = false;
     }
     componentDidMount(){
         this.transform(this.props.data);
+        window.addEventListener('resize',()=> this.transform(this.props.data));
     }
     componentWillReceiveProps(nextProps){
         this.transform(nextProps.data);
-    }
-    componentDidUpdate(){    
-        if(!this.isListenerSet){
-            window.addEventListener('resize',()=> this.transform(this.props.data));
-            this.isListenerSet = true;
-        }
     }
     componentWillUnmount(){
         window.removeEventListener('resize');
     }
     transform(data){
+        let parseTime = this.parseTime = timeParse('%Y-%m-%d');
         let chartWidth = this.node.parentNode.getBoundingClientRect().width;
         let margin = this.props.margin;
-        let xScale = scaleLinear().domain(extent(data, d=> d.x)).range([0,chartWidth - margin.left - margin.right]);
-        let yScale = scaleLinear().domain(extent(data, d=> d.y)).range([this.props.height - margin.top - margin.bottom,0]);
-        let lineGen = d3Line().x(d=> xScale(d.x)).y(d=> yScale(d.y));
+        let xScale = this.xScale = scaleLinear().domain(extent(data, d=> d.x)).range([0,chartWidth - margin.left - margin.right]);
+        if(this.props.isTimeScaled){
+            xScale = scaleTime().domain(extent(data, d=> parseTime(d.x))).range([0,chartWidth - margin.left - margin.right]);
+        }
+        let yScale = this.yScale = scaleLinear().domain(extent(data, d=> d.y)).range([this.props.height - margin.top - margin.bottom,0]);
+        let lineGen = this.props.isTimeScaled?d3Line().x(d=> xScale(parseTime(d.x))).y(d=> yScale(d.y)):d3Line().x(d=> xScale(d.x)).y(d=> yScale(d.y));
         this.setState({
-            pathData: lineGen(data), width: chartWidth - margin.left - margin.right 
+            pathData: lineGen(data), width: chartWidth - margin.left - margin.right,
+            dots: data.map((d)=>({
+                x: this.props.isTimeScaled?xScale(this.parseTime(d.x)):xScale(d.x),
+                y: yScale(d.y)
+            })) 
         });
         if(this.props.showAxes){
             let translateXAxis = `translate(${this.props.margin.left},${this.props.height - margin.bottom  })`;
@@ -58,6 +61,12 @@ export default class SimpleLineChart extends Component {
                 {   this.state.pathData && 
                     <g transform={translateG}>
                         <path d={this.state.pathData} fill="none" stroke={this.props.lineColor} />
+                        {
+                            this.state.dots.map((p,i) =>
+                                <circle key={i} fill={this.props.lineColor} 
+                                cx={p.x} cy={p.y} r={2}></circle>
+                            )
+                        }
                     </g>
                 }
             </svg>

@@ -1,10 +1,10 @@
-$primary-color: '#009988';
 .default{
     margin: 10px;
     font-family: Arial, Helvetica, sans-serif;
 }
 rect{
     transition: all 0.3s ease-in;
+    cursor: pointer;
 }
 .center-label{
     text-anchor:middle;

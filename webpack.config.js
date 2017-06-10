@@ -9,12 +9,12 @@ var extractSass = new ExtractTextPlugin({
 });
 var config = {
     context: path.resolve(__dirname),
-    entry:[
-        './index.js'
-    ],
+    entry:{
+        app:'./index.js'
+    },
     output:{
         path: path.resolve(__dirname,'dist'),
-        filename:'app.bundle.js'
+        filename:'[name].bundle.js'
     },
     watch:devMode,
     devtool:devMode?'sourcemap':'',
@@ -33,7 +33,11 @@ var config = {
                 }],
                 fallback:'style-loader'
             })
-        }] 
+        },{
+            test:/\.json$/,
+            loaders:['json-loader'],
+            exclude: /node_modules/
+        }]
     },
     plugins:[
         // new CleanWebpackPlugin(['dist']),

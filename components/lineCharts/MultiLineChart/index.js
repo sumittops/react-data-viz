@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { scaleLinear } from 'd3-scale';
+import { scaleLinear, scaleTime } from 'd3-scale';
+import { timeParse } from 'd3-time-format';
 import PropTypes from 'prop-types';
 import { min, max } from 'd3-array';
 import { axisBottom, axisLeft, axisRight } from 'd3-axis';
 import { select as d3Select } from 'd3-selection';
-import { line as d3Line } from 'd3-shape';
+import { line as d3Line, interpolate } from 'd3-shape';
 import { Color } from '../../../core/utils';
 import '../line-chart.scss';
 export default class MultiLineChart extends Component {
@@ -14,47 +15,55 @@ export default class MultiLineChart extends Component {
             width: '100%',
             pathData: null,
         };
-        this.isListenerSet = false;
     }
     componentDidMount(){
         this.transform(this.props.data);
+        window.addEventListener('resize',()=> this.transform(this.props.data));
     }
     componentWillReceiveProps(nextProps){
         this.transform(nextProps.data);
-    }
-    componentDidUpdate(){    
-        if(!this.isListenerSet){
-            window.addEventListener('resize',()=> this.transform(this.props.data));
-            this.isListenerSet = true;
-        }
     }
     componentWillUnmount(){
         window.removeEventListener('resize');
     }
     transform(data){
-        let color = new Color();
-        let chartWidth = this.node.parentNode.getBoundingClientRect().width;
-        let margin = this.props.margin;
-        let xMin = min(data, d=> min(d.values, d1 => d1.x ));
-        let xMax = max(data, d=> max(d.values, d1 => d1.x ));
-        let yMin = min(data, d=> min(d.values, d1 => d1.y ));
-        let yMax = max(data, d=> max(d.values, d1 => d1.y ));
-        let xScale = scaleLinear().domain([xMin, xMax]).range([0,chartWidth - margin.left - margin.right]);
-        let yScale = scaleLinear().domain([yMin, yMax]).range([this.props.height - margin.top - margin.bottom,0]);
-        let lineGen = d3Line().x(d=> xScale(d.x)).y(d=> yScale(d.y));
+        var lineGen,
+            color = new Color(),
+            chartWidth = this.node.parentNode.getBoundingClientRect().width,
+            margin = this.props.margin,xMin,xMax,xScale,yScale;
+        var parseTime = timeParse("%Y-%m-%d");
+        var yMin = min(data, d=> min(d.values, d1 => d1.y ));
+        var yMax = max(data, d=> max(d.values, d1 => d1.y ));
+        if(this.props.isTimeScaled){
+            xMin = min(data, d=> min(d.values, d1 => parseTime(d1.x) ));
+            xMax = max(data, d=> max(d.values, d1 => parseTime(d1.x) ));
+            xScale = this.xScale = scaleTime().domain([xMin,xMax]).range([0,chartWidth - margin.left - margin.right]);
+            yScale = this.yScale = scaleLinear().domain([yMin, yMax]).range([this.props.height - margin.top - margin.bottom,0]);
+            lineGen = d3Line().x(d=> xScale(parseTime(d.x))).y(d=> yScale(d.y));
+        }else{
+            xMin = min(data, d=> min(d.values, d1 => d1.x ));
+            xMax = max(data, d=> max(d.values, d1 => d1.x ));
+            xScale = this.xScale = scaleLinear().domain([xMin, xMax]).range([0,chartWidth - margin.left - margin.right]);
+            yScale = this.yScale = scaleLinear().domain([yMin, yMax]).range([this.props.height - margin.top - margin.bottom,0]);
+            lineGen = d3Line().x(d=> xScale(d.x)).y(d=> yScale(d.y));
+        }
         this.setState({
             pathData: data.map(d=>{
                 let nextColor = color.getNextColor();
                 let item = {
                     key: d.key, 
                     values: d.values, 
+                    dots: d.values.map(({x,y})=>({
+                        x: this.props.isTimeScaled?xScale(parseTime(x)):xScale(x), y: yScale(y), color: nextColor
+                    })),
                     path: lineGen(d.values),
                     style: {
                         stroke:nextColor
                     },
                     legendStyle:{
                         backgroundColor:nextColor
-                    }
+                    },
+                    isActive: d.isActive || true
                 };
                 return item;
             }), width: chartWidth - margin.left - margin.right 
@@ -92,6 +101,12 @@ export default class MultiLineChart extends Component {
                                 this.state.pathData.map(d=>
                                     <g key={d.key}>
                                         <path className="line" fill="none" style={d.style} d={d.path}></path>
+                                        { d.dots.map((item,i) =>
+                                            <circle  key={i} fill={item.color} cx={item.x} cy={item.y} r={2}
+                                                onMouseEnter={(e)=>this.showTooltip()}
+                                            ></circle>
+                                            )
+                                        }
                                     </g>
                                 )
                             }
@@ -116,10 +131,11 @@ MultiLineChart.propTypes = {
         top: PropTypes.number,
         bottom: PropTypes.number,
     }),
-    showAxes: PropTypes.bool
+    showAxes: PropTypes.bool,
+    interpolate: PropTypes.string
 };
 MultiLineChart.defaultProps = {
     data: [], isTimeScaled: false, margin:{
         left: 30, top: 10, bottom: 20, right: 10
-    }, height: 300, showAxes: true
+    }, height: 300, showAxes: true, interpolate: 'basis'
 };

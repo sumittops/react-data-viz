@@ -1,20 +1,23 @@
 import React, { Component } from 'react';
 import './tooltip.scss';
-
-export default class Tooltip extends  Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            visible: false
-        };
-    }
-
-    render(){
-        const className = this.state.visible?'tooltip':'tooltip hidden';
-        return(
-            <div className={className}>
-                {this.props.content}
-            </div>
-        )
-    }
+import PropTypes from 'prop-types';
+export default function Tooltip(props){
+    const className  = props.content?'tooltip':'tooltip hidden';
+    const style = {
+        top: props.position.y, left: props.position.x,
+    };
+    return(
+        <div style={style} className={className}>
+            {props.content}
+        </div>
+    )
 }
+Tooltip.propTypes = {
+    content:PropTypes.object,
+    position:PropTypes.shape({
+        x: PropTypes.number.isRequired, y: PropTypes.number.isRequired
+    })
+}
+Tooltip.defaultProps = {
+    content: <div></div>
+};

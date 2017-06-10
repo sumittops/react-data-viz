@@ -18,16 +18,10 @@ export default class HorizontalBarChart extends Component{
             })),
             width: '100%'
         };
-        this.eventListenerSet = false;
-    }
-    componentDidUpdate (){
-        if(!this.eventListenerSet){
-            window.addEventListener('resize',()=>this.transform());
-            this.eventListenerSet = true;
-        } 
     }
     componentDidMount(){
         this.transform();
+        window.addEventListener('resize',()=>this.transform());
     }
     componentWillUnmount(){
         window.removeEventListener('resize');
@@ -51,6 +45,24 @@ export default class HorizontalBarChart extends Component{
             d3Select(this.node).append('g').attr('id','x-axis').attr('transform',translateAxis).call(axisBottom().scale(this.scale));          
         } 
     }
+    showTooltip(event,index){
+        try{
+            const position = {
+                x: event.nativeEvent.offsetX,
+                y: event.nativeEvent.offsetY
+            };
+            let item = this.state.data[index];
+            let html = (<div>
+                    <b>{item.key}</b><b>:</b> <span>{item.value}</span>
+                </div>);
+            this.props.tooltipUpdate(position,html);
+        }catch(e){
+            console.warn(e);
+        }
+    }
+    hideTooltip(){
+        this.props.tooltipUpdate(null,null);
+    }
     render(){
         let translateG = `translate(${this.props.margin.left},${this.props.margin.top})`;
         return (
@@ -62,7 +74,11 @@ export default class HorizontalBarChart extends Component{
                     this.state.data.map((item,i)=>
                         <g key={item.key} transform={item.transform}>
                             <text className="horizontal-bar-label" x={-2} y={this.props.barHeight/2}>{item.key}</text>
-                            <rect height={this.props.barHeight} key={i} width={item.width} fill={item.color}></rect>
+                            <rect height={this.props.barHeight} key={i} width={item.width} fill={item.color}
+                                onMouseOver={(e)=>this.showTooltip(e,i)} 
+                                onMouseMove={(e)=>this.showTooltip(e,i)} 
+                                onMouseOut={e=>this.hideTooltip()}
+                            ></rect>
                         </g>
                     )
                 }
