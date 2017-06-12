@@ -26,6 +26,25 @@ export default class SimpleLineChart extends Component {
     componentWillUnmount(){
         window.removeEventListener('resize');
     }
+    showTooltip(e,i){
+        try{
+            const { top, left }= e.nativeEvent.target.getBoundingClientRect();
+            const position = {
+                x: left,
+                y: top
+            };
+            const item = this.props.data[i];
+            const html = (<div>
+                <b>{item.x}: </b><span>{item.y}</span>
+            </div>);
+            this.props.tooltipUpdate(position,html);
+        }catch(e){
+            console.warn(e);
+        }
+    }
+    hideTooltip(){
+        this.props.tooltipUpdate(null,null);
+    }
     transform(data){
         let parseTime = this.parseTime = timeParse('%Y-%m-%d');
         let chartWidth = this.node.parentNode.getBoundingClientRect().width;
@@ -63,8 +82,11 @@ export default class SimpleLineChart extends Component {
                         <path d={this.state.pathData} fill="none" stroke={this.props.lineColor} />
                         {
                             this.state.dots.map((p,i) =>
-                                <circle key={i} fill={this.props.lineColor} 
-                                cx={p.x} cy={p.y} r={2}></circle>
+                                <circle key={i} fill={this.props.lineColor} className="dot"
+                                cx={p.x} cy={p.y} r={4}
+                                onClick={(e)=>this.showTooltip(e,i)} 
+                                onMouseOut={e=>this.hideTooltip()}
+                                ></circle>
                             )
                         }
                     </g>

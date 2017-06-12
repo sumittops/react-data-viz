@@ -77,6 +77,27 @@ export default class MultiLineChart extends Component {
             d3Select(this.node).append('g').attr('id','y-axis').attr('transform',translateYAxis).call(axisLeft().scale(yScale));
         }
     }
+    showTooltip(event, index){
+        try{
+            const {top, left }= event.nativeEvent.target.getBoundingClientRect();
+            const position = {
+                x: left,
+                y: top
+            };
+            let items = this.state.pathData.filter(d=>d.isActive).map((d,i)=>
+                <div key={i}><b>{d.key}</b><b>:</b> <span>{d.values[index].y}</span></div>
+            );
+            let html = (<div>
+                    { items }
+                </div>);
+            this.props.tooltipUpdate(position,html);
+        }catch(e){
+            console.warn(e);
+        }
+    }
+    hideTooltip(){
+        this.props.tooltipUpdate(null,null);   
+    }
     render(){
         let translateG = `translate(${this.props.margin.left},${this.props.margin.top})`;
         return (
@@ -102,8 +123,9 @@ export default class MultiLineChart extends Component {
                                     <g key={d.key}>
                                         <path className="line" fill="none" style={d.style} d={d.path}></path>
                                         { d.dots.map((item,i) =>
-                                            <circle  key={i} fill={item.color} cx={item.x} cy={item.y} r={2}
-                                                onMouseEnter={(e)=>this.showTooltip()}
+                                            <circle className="dot"  key={i} fill={item.color} cx={item.x} cy={item.y} r={4}
+                                                onClick={(e)=>this.showTooltip(e,i)}
+                                                onMouseOut={e=>this.hideTooltip()}
                                             ></circle>
                                             )
                                         }

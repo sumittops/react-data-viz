@@ -48,8 +48,8 @@ export default class HorizontalBarChart extends Component{
     showTooltip(event,index){
         try{
             const position = {
-                x: event.nativeEvent.offsetX,
-                y: event.nativeEvent.offsetY
+                x: event.nativeEvent.clientX,
+                y: event.nativeEvent.clientY
             };
             let item = this.state.data[index];
             let html = (<div>
@@ -75,8 +75,7 @@ export default class HorizontalBarChart extends Component{
                         <g key={item.key} transform={item.transform}>
                             <text className="horizontal-bar-label" x={-2} y={this.props.barHeight/2}>{item.key}</text>
                             <rect height={this.props.barHeight} key={i} width={item.width} fill={item.color}
-                                onMouseOver={(e)=>this.showTooltip(e,i)} 
-                                onMouseMove={(e)=>this.showTooltip(e,i)} 
+                                onClick={(e)=>this.showTooltip(e,i)} 
                                 onMouseOut={e=>this.hideTooltip()}
                             ></rect>
                         </g>
