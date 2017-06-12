@@ -56,12 +56,11 @@ export default class App extends React.Component{
     render(){
         return (
             <div>
-                <HorizontalBarChart barHeight={25} data={fakeData} height={110} 
-                    margin={horizontalChartMargin} tooltipUpdate={this.tooltipUpdate}/>
                 <VerticalBarChart data={fakeData}  tooltipUpdate={this.tooltipUpdate} barWidth={25} height={300} />
                 <SimpleLineChart isTimeScaled={true} data={this.state.data}  tooltipUpdate={this.tooltipUpdate} lineColor={'#009688'}></SimpleLineChart>
                 <MultiLineChart isTimeScaled={true} data={this.state.data2}  tooltipUpdate={this.tooltipUpdate}></MultiLineChart>
-
+                <HorizontalBarChart barHeight={25} data={fakeData} height={110} 
+                    margin={horizontalChartMargin} tooltipUpdate={this.tooltipUpdate}/>
                 <Tooltip position={this.state.tooltipPosition} content={this.state.tooltipData}/>
             </div>
         );

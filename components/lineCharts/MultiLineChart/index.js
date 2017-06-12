@@ -79,10 +79,9 @@ export default class MultiLineChart extends Component {
     }
     showTooltip(event, index){
         try{
-            const {top, left }= event.nativeEvent.target.getBoundingClientRect();
             const position = {
-                x: left,
-                y: top
+                x: event.nativeEvent.clientX,
+                y: event.nativeEvent.clientY
             };
             let items = this.state.pathData.filter(d=>d.isActive).map((d,i)=>
                 <div key={i}><b>{d.key}</b><b>:</b> <span>{d.values[index].y}</span></div>

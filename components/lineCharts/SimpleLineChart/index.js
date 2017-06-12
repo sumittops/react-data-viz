@@ -28,10 +28,9 @@ export default class SimpleLineChart extends Component {
     }
     showTooltip(e,i){
         try{
-            const { top, left }= e.nativeEvent.target.getBoundingClientRect();
             const position = {
-                x: left,
-                y: top
+                x: e.nativeEvent.clientX,
+                y: e.nativeEvent.clientY
             };
             const item = this.props.data[i];
             const html = (<div>

@@ -32,13 +32,34 @@ export default class VerticalBarChart extends Component{
             isDataReady:true
         });
     }
+    showTooltip(event,index){
+        try{
+            const position = {
+                x: event.nativeEvent.clientX,
+                y: event.nativeEvent.clientY
+            };
+            let item = this.state.data[index];
+            let html = (<div>
+                    <b>{item.key}</b><b>:</b> <span>{item.value}</span>
+                </div>);
+            this.props.tooltipUpdate(position,html);
+        }catch(e){
+            console.warn(e);
+        }
+    }
+    hideTooltip(){
+        this.props.tooltipUpdate(null,null);
+    }
     render(){
         return (
             <svg className="default" ref={node=> this.node = node} height={this.props.height} width={this.state.width}>
                 { 
                     this.state.data.map((d,i)=>
                         <g key={i} transform={d.transform}>
-                            <rect fill={d.color} width={this.props.barWidth} height={d.height}></rect>-
+                            <rect fill={d.color} width={this.props.barWidth} height={d.height}
+                                onClick={(e)=>this.showTooltip(e,i)} 
+                                onMouseOut={e=>this.hideTooltip()}
+                            ></rect>-
                         </g>
                     )
                 }
